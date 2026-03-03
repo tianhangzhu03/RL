@@ -1,0 +1,53 @@
+# Asset screen (XLF) under the D2 design:
+# delta actions + lower opportunity cost, for quick comparability to the QQQ design ablation.
+dataset:
+  symbol: XLF
+  start: "2000-01-01"
+  end: "2026-01-31"
+
+features:
+  mean_window: 10
+  vol_window: 20
+  momentum_window: 10
+
+env:
+  actions: [-0.25, 0.0, 0.25]
+  action_mode: delta
+  min_position: 0.0
+  max_position: 1.0
+  transaction_cost: 0.0005
+  risk_window: 60
+  risk_alpha: 0.95
+  lambda_vol: 0.008
+  lambda_cvar: 0.01
+  vol_target: 0.025
+  cvar_target: 0.03
+  penalize_excess_risk_only: true
+  inactivity_penalty: 0.00002
+  opportunity_cost_coeff: 0.02
+
+training:
+  episodes: 120
+  gamma: 0.99
+  epsilon_start: 1.0
+  epsilon_min: 0.05
+  epsilon_decay: 0.97
+  risk_warmup_episodes: 80
+  convergence_reward_threshold: 0.0
+  convergence_window: 10
+  seeds: [11, 22, 33, 44, 55]
+
+q_learning:
+  alpha: 0.05
+  bins: 8
+
+sg_sarsa:
+  alpha: 0.02
+
+nstep_sarsa:
+  alpha: 0.01
+  n: 4
+
+split:
+  train_ratio: 0.6
+  val_ratio: 0.2

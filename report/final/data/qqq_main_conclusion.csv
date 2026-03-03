@@ -1,0 +1,4 @@
+model,reward,return,CVaR,MDD,train_time_s,n_runs,source
+Baseline(with_cvar),0.8852597941749154,1.2334792059034076,0.032222620230917896,-0.35118728439745206,0.0,5,runs_qqq_baseline/q_learning/with_cvar/*/baseline_metrics.json (buy_hold)
+"q_learning (with_cvar, baseline cfg)",-0.2371618311170624,0.772453779763256,0.02167744243064334,-0.2002289908135812,34.338973033399085,5,"runs_qqq_baseline/suite_summary.csv [algo=q_learning,tag=with_cvar]"
+"nstep_sarsa (with_cvar, tuned supplement)",0.9324893678767469,1.233479931487662,0.032222612618197,-0.3511872068303711,40.44028558339342,5,runs/tuned_best_qqq_v4_eval_ns/20260224_143402/suite_summary.csv [algo=nstep_sarsa]

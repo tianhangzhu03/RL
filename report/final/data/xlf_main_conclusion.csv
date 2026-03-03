@@ -1,0 +1,4 @@
+model,reward,return,CVaR,MDD,train_time_s,n_runs,source
+Baseline(with_cvar),0.8321054351812978,1.1428270807941532,0.026612217256462706,-0.25805332794186875,0.0,5,runs_xlf_baseline/q_learning/with_cvar/*/baseline_metrics.json (buy_hold)
+"q_learning (with_cvar, baseline cfg)",0.1335774559201705,0.30579929523293975,0.00720453634119974,-0.0777003249285313,34.57651325819315,5,"runs_xlf_baseline/suite_summary.csv [algo=q_learning,tag=with_cvar]"
+"nstep_sarsa V2 (with_cvar, tuned)",0.5209719687123192,0.7303149864709415,0.02053929186173032,-0.19068834927506256,33.104921000008474,5,/Users/benjaminzth/Desktop/Courses/EE473DeepRL/RL/runs/tuned_best_xlf_v2_eval_ns/20260226_235914/suite_summary.csv [algo=nstep_sarsa]

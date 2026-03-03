@@ -1,0 +1,25 @@
+promotion:
+  # Preferred gate: primary objective + tolerance band + seed consistency.
+  # Goal is robust improvement, not fragile mean-only gains.
+  primary_metric: return
+  primary_min_delta: -0.002
+  secondary_metric: reward
+  secondary_min_delta: -0.01
+  seed_consistency_metric: return
+  seed_min_nonworse_count: 3
+  seed_delta_tolerance: -0.03
+
+  # Risk regression tolerances (allow small trade-offs, reject material deterioration).
+  max_cvar_regression: 0.0035
+  max_mdd_regression: 0.04
+  require_positive_lambda_cvar: true
+
+compliance:
+  # "Moderately large-sized" is enforced conservatively for daily data.
+  min_total_samples: 3000
+  min_eval_seeds: 5
+  require_algorithms: ["q_learning", "nstep_sarsa"]
+  require_with_and_no_cvar_for_target_algo: true
+  require_validation_only_tuning_artifacts: true
+  require_tuning_artifacts: true
+  require_tabular_and_function_approx: true

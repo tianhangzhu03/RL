@@ -1,0 +1,52 @@
+dataset:
+  end: '2026-01-31'
+  start: '2000-01-01'
+  symbol: XLF
+env:
+  action_mode: delta
+  actions:
+  - -0.25
+  - 0.0
+  - 0.25
+  cvar_target: 0.03
+  inactivity_penalty: 2.0e-05
+  lambda_cvar: 0.01
+  lambda_vol: 0.008
+  max_position: 1.0
+  min_position: 0.0
+  opportunity_cost_coeff: 0.02
+  penalize_excess_risk_only: true
+  risk_alpha: 0.95
+  risk_window: 60
+  transaction_cost: 0.0005
+  vol_target: 0.025
+features:
+  mean_window: 10
+  momentum_window: 10
+  vol_window: 20
+nstep_sarsa:
+  alpha: 0.01
+  n: 4
+q_learning:
+  alpha: 0.05
+  bins: 8
+sg_sarsa:
+  alpha: 0.015
+split:
+  train_ratio: 0.6
+  val_ratio: 0.2
+training:
+  convergence_reward_threshold: 0.0
+  convergence_window: 10
+  episodes: 200
+  epsilon_decay: 0.95
+  epsilon_min: 0.01
+  epsilon_start: 1.0
+  gamma: 0.99
+  risk_warmup_episodes: 80
+  seeds:
+  - 11
+  - 22
+  - 33
+  - 44
+  - 55
