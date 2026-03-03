@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+runs/
+runs_smoke/
+runs_*/
+archive_runs/
+report/figures/*.png
