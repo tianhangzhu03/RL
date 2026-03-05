@@ -1,0 +1,4 @@
+sequence,algo,algo_label,reward_delta,return_delta,cvar_delta,mdd_delta,check_primary,check_secondary,check_cvar,check_mdd,check_seed_consistency,promoted,decision,decision_reason
+1,q_learning,Q-learning,0.4562,0.6199,0.0183,-0.1709,True,True,False,False,True,False,REJECTED,Fails risk checks (CVaR/MDD) despite utility gains.
+2,sg_sarsa,SG-Sarsa,0.0374,0.065,0.0053,-0.0646,True,True,False,False,True,False,REJECTED,Fails risk checks (CVaR/MDD) despite utility gains.
+3,nstep_sarsa,n-step Sarsa,0.0217,0.0236,0.0019,-0.031,True,True,True,True,True,True,PROMOTED,Passes utility + risk checks under synchronized gate.

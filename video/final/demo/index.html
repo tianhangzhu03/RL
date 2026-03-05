@@ -1,0 +1,1442 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Risk-Sensitive TD Trading Interactive Demo</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+      :root {
+        --bg: #f2f6f9;
+        --surface: #ffffff;
+        --ink: #132031;
+        --muted: #5a6a79;
+        --line: #d6e1ea;
+        --blue: #2b5f8a;
+        --teal: #1f7b7a;
+        --green: #2f8f4f;
+        --red: #b1463d;
+        --amber: #b27a25;
+        --shadow: 0 10px 24px rgba(17, 37, 56, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(1400px 450px at 12% -12%, #e9f0f5 0%, transparent 52%),
+          radial-gradient(1400px 450px at 88% -10%, #e8f0ed 0%, transparent 52%),
+          var(--bg);
+      }
+
+      .page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .hero {
+        background: linear-gradient(105deg, #13293c 0%, #1a4467 58%, #1f5b7d 100%);
+        color: #edf4fb;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 18px 20px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .hero p {
+        margin: 8px 0 0;
+        color: #d6e5f1;
+        font-size: 14px;
+      }
+
+      .meta {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(229, 239, 250, 0.3);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        color: #e6f0fb;
+      }
+
+      .tabs {
+        margin-top: 14px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tab-btn {
+        border: 1px solid #c8d7e5;
+        background: #f7fbff;
+        color: #1c3550;
+        border-radius: 10px;
+        padding: 7px 11px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .tab-btn.active {
+        background: #eaf4fd;
+        border-color: #92b7d4;
+        font-weight: 600;
+      }
+
+      .panel {
+        margin-top: 12px;
+        display: none;
+      }
+
+      .panel.active {
+        display: block;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 12px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .card-head {
+        padding: 11px 13px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .card-head h2,
+      .card-head h3 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .card-body {
+        padding: 12px 13px;
+      }
+
+      .small {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .kpi {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px;
+        background: #f9fcff;
+      }
+
+      .kpi .label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .kpi .value {
+        margin-top: 4px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 6px;
+        text-align: center;
+      }
+
+      th {
+        background: #f5f8fb;
+        font-weight: 600;
+      }
+
+      tr.promoted td {
+        background: rgba(47, 143, 79, 0.08);
+      }
+
+      .algo-role {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px;
+        background: #fbfdff;
+      }
+
+      .algo-role h4 {
+        margin: 0 0 6px;
+        font-size: 14px;
+      }
+
+      .algo-role p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 110px 1fr 72px;
+        gap: 8px;
+        align-items: center;
+        margin: 8px 0;
+      }
+
+      .bar-row label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .bar-bg {
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #ecf1f6;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 0;
+        transition: width 340ms ease;
+      }
+
+      .bar-fill.good {
+        background: linear-gradient(90deg, #4ea66b, #84c28b);
+      }
+
+      .bar-fill.bad {
+        background: linear-gradient(90deg, #c45f56, #d2928b);
+      }
+
+      .bar-val {
+        text-align: right;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+      }
+
+      .checks {
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .check {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 5px 6px;
+        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .check.pass {
+        border-color: rgba(47, 143, 79, 0.3);
+        background: rgba(47, 143, 79, 0.08);
+      }
+
+      .check.fail {
+        border-color: rgba(177, 70, 61, 0.3);
+        background: rgba(177, 70, 61, 0.08);
+      }
+
+      .decision-line {
+        margin-top: 9px;
+        border: 1px dashed #c8d7e6;
+        border-radius: 10px;
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .decision-tag {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .decision-tag.promoted {
+        color: var(--green);
+        background: rgba(47, 143, 79, 0.15);
+      }
+
+      .decision-tag.rejected {
+        color: var(--red);
+        background: rgba(177, 70, 61, 0.15);
+      }
+
+      .controls {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      button,
+      select {
+        border: 1px solid #c9d8e5;
+        border-radius: 9px;
+        background: #f8fbff;
+        color: #1a324a;
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #ecf6ff;
+      }
+
+      .algo-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .algo-card {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 9px;
+        background: #fbfdff;
+        transition: all 220ms ease;
+      }
+
+      .algo-card.active {
+        border-color: #8eb8d7;
+        box-shadow: 0 7px 16px rgba(31, 92, 143, 0.14);
+        transform: translateY(-2px);
+      }
+
+      .algo-card .name {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .algo-card .meta-line {
+        margin-top: 5px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .lab-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 12px;
+      }
+
+      .slider-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px 12px;
+      }
+
+      .s-item label {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .s-item input[type="range"] {
+        width: 100%;
+      }
+
+      .formula {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #f7fbff;
+        padding: 10px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .result-grid {
+        margin-top: 9px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .rbox {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 7px;
+        background: #fbfdff;
+      }
+
+      .rbox .k {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .rbox .v {
+        margin-top: 3px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 13px;
+      }
+
+      .metric-bars .row {
+        display: grid;
+        grid-template-columns: 86px 1fr 70px;
+        gap: 7px;
+        align-items: center;
+        margin: 8px 0;
+      }
+
+      .metric-bars .row label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .stage-chart {
+        margin-top: 8px;
+      }
+
+      .stage-row {
+        display: grid;
+        grid-template-columns: 90px 1fr 68px;
+        align-items: center;
+        gap: 8px;
+        margin: 7px 0;
+      }
+
+      .stage-row .label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .stage-row .bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #ecf1f6;
+        overflow: hidden;
+      }
+
+      .stage-row .fill {
+        height: 100%;
+        background: linear-gradient(90deg, #2f6e9f, #7daace);
+      }
+
+      .stage-row .value {
+        text-align: right;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+      }
+
+      .impact-list {
+        margin: 8px 0 0;
+        padding-left: 16px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.42;
+      }
+
+      .case-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 12px;
+      }
+
+      .case-banner {
+        border: 1px solid #c8d8e6;
+        border-radius: 11px;
+        background: #f6fbff;
+        padding: 9px 10px;
+        font-size: 12px;
+        color: #27435e;
+        margin-top: 8px;
+      }
+
+      .rule-tag {
+        display: inline-block;
+        margin-top: 6px;
+        border: 1px solid #bfd3e4;
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 11px;
+        color: #285072;
+        background: #f2f8fd;
+      }
+
+      .case-bullets {
+        margin: 8px 0 0;
+        padding-left: 16px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .case-table tr.selected td {
+        background: rgba(31, 92, 143, 0.13);
+      }
+
+      .chart-wrap {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px;
+        background: #fcfeff;
+      }
+
+      .chart-title {
+        font-size: 12px;
+        color: #40586e;
+        margin: 0 0 6px;
+      }
+
+      .chart-note {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .footer {
+        margin-top: 12px;
+        color: #697888;
+        font-size: 11px;
+      }
+
+      @media (max-width: 1024px) {
+        .grid-2,
+        .lab-layout,
+        .params,
+        .algo-cards,
+        .grid-3,
+        .case-grid {
+          grid-template-columns: 1fr;
+        }
+        .checks {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <h1>Interactive Demo: Why Compare 3 TD Algorithms on XLF?</h1>
+        <p>
+          This demo shows method principles, gate-based evidence, and parameter-driven
+          setbacks using only existing project artifacts.
+        </p>
+        <div class="meta">
+          <span class="pill">Asset: XLF</span>
+          <span class="pill">Objective: Return under downside constraints</span>
+          <span class="pill">Methods: Q-learning, SG-Sarsa, n-step Sarsa</span>
+        </div>
+      </section>
+
+      <section class="tabs" id="tabs"></section>
+
+      <section id="panel-xlf" class="panel active">
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head"><h2>Why XLF for this comparison?</h2></div>
+            <div class="card-body">
+              <p class="small">
+                XLF is used as the mainline asset because it is liquid, diversified at the
+                sector level, and still contains meaningful drawdown-recovery cycles. This
+                gives a clearer risk-return testbed than a single-name momentum stock.
+              </p>
+              <div class="kpi-grid" id="xlfKpis"></div>
+              <p class="small" style="margin-top:10px">
+                Practical role: this is not a signal-generation contest; it is a policy-selection
+                problem under constraints. The gate decides whether utility gains are acceptable
+                once downside risk is considered.
+              </p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><h2>What each algorithm contributes</h2></div>
+            <div class="card-body grid-3">
+              <div class="algo-role">
+                <h4>Q-learning</h4>
+                <p>
+                  Off-policy baseline. Useful to test whether aggressive utility improvement
+                  appears, and whether risk checks reject that behavior.
+                </p>
+              </div>
+              <div class="algo-role">
+                <h4>SG-Sarsa</h4>
+                <p>
+                  On-policy linear approximation. Useful for testing sensitivity to learning rate,
+                  exploration schedule, and episode budget.
+                </p>
+              </div>
+              <div class="algo-role">
+                <h4>n-step Sarsa</h4>
+                <p>
+                  Multi-step credit assignment. Useful for balancing utility gain and risk drift
+                  under the synchronized gate.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="card" style="margin-top:12px">
+          <div class="card-head"><h3>Candidate-level outcomes on XLF (from headline table)</h3></div>
+          <div class="card-body">
+            <table id="headlineTable"></table>
+            <ul class="impact-list">
+              <li>Comparison purpose: isolate algorithm behavior under identical environment and gate.</li>
+              <li>Actual use: choose deployable policy candidates, not just the highest unconstrained return.</li>
+              <li>Decision criterion: promotion under risk constraints is stronger than raw uplift.</li>
+            </ul>
+          </div>
+        </article>
+      </section>
+
+      <section id="panel-mechanics" class="panel">
+        <div class="lab-layout">
+          <article class="card">
+            <div class="card-head"><h2>TD Mechanics Lab (Interactive)</h2></div>
+            <div class="card-body">
+              <div class="controls" id="algoModeBtns"></div>
+              <div class="slider-grid" id="sliderGrid"></div>
+              <div class="formula" id="formulaBox" style="margin-top:10px"></div>
+              <div class="result-grid" id="resultGrid"></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><h2>How this explains the comparison</h2></div>
+            <div class="card-body">
+              <p class="small" id="mechanicsExplain"></p>
+              <div class="small" style="margin-top:10px">
+                <strong>Interpretation guide</strong>
+                <ul class="impact-list" style="margin-top:6px">
+                  <li>Higher target variance can produce faster utility uplift but unstable risk behavior.</li>
+                  <li>On-policy updates are often smoother but sensitive to exploration/step-size regime.</li>
+                  <li>Multi-step targets can improve horizon alignment under constrained objectives.</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="panel-gate" class="panel">
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head"><h2>Gate Decision Replay</h2></div>
+            <div class="card-body">
+              <div id="algoCards" class="algo-cards"></div>
+              <div class="controls">
+                <button id="prevBtn" type="button">Prev</button>
+                <button id="playBtn" type="button">Pause</button>
+                <button id="nextBtn" type="button">Next</button>
+                <span id="stepTag" class="pill" style="color:#274763;border-color:#c8d8e7;background:#f6fbff"></span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><h2 id="focusTitle">Focused Metrics</h2></div>
+            <div class="card-body">
+              <div id="metricBars" class="metric-bars"></div>
+              <div id="checkGrid" class="checks"></div>
+              <div id="decisionLine" class="decision-line"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="panel-application" class="panel">
+        <div class="case-grid">
+          <article class="card">
+            <div class="card-head"><h2>ETF Operation Case (XLF)</h2></div>
+            <div class="card-body">
+              <div class="controls">
+                <label for="riskProfile" class="small" style="margin-right:4px">Risk profile</label>
+                <select id="riskProfile">
+                  <option value="conservative">Conservative (strict risk gate)</option>
+                  <option value="balanced" selected>Balanced (promoted-first)</option>
+                  <option value="aggressive">Aggressive (return-first)</option>
+                </select>
+                <label for="capitalInput" class="small" style="margin-left:6px">Initial capital ($)</label>
+                <input id="capitalInput" type="number" min="1000" step="1000" value="10000" style="width:110px" />
+              </div>
+
+              <div id="caseBanner" class="case-banner"></div>
+              <div id="caseRuleTag" class="rule-tag"></div>
+
+              <table id="caseTable" class="case-table" style="margin-top:8px"></table>
+              <p class="small" style="margin-top:8px">
+                Final capital is computed as: <code>initial_capital * (1 + cumulative_return)</code>.
+                All returns and risk metrics are from existing XLF headline artifacts.
+              </p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><h2>How this maps to practical use</h2></div>
+            <div class="card-body">
+              <div class="chart-wrap">
+                <p class="chart-title">XLF Trend + Strategy Return Projection</p>
+                <svg id="caseChart" viewBox="0 0 520 220" width="100%" height="220" aria-label="XLF trend and strategy return projection chart"></svg>
+                <div class="chart-note">
+                  Solid teal line: historical monthly normalized XLF close (2019-01 to 2026-01).<br />
+                  Dashed lines: start-to-end return projection for each algorithm using aggregate cumulative return.
+                </div>
+              </div>
+              <p class="small" id="caseNarrative"></p>
+              <ul id="caseBullets" class="case-bullets"></ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="panel-tuning" class="panel">
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head"><h2>SG Tuning Setback Explorer</h2></div>
+            <div class="card-body">
+              <div class="controls">
+                <label for="metricSelect" class="small" style="margin-right:4px">Metric</label>
+                <select id="metricSelect">
+                  <option value="return_delta">return_delta</option>
+                  <option value="reward_delta">reward_delta</option>
+                  <option value="cvar_delta">cvar_delta</option>
+                  <option value="mdd_delta">mdd_delta</option>
+                  <option value="train_seconds">train_seconds</option>
+                </select>
+              </div>
+              <div id="stageChart" class="stage-chart"></div>
+              <p class="small" style="margin-top:8px">
+                This panel demonstrates why tuning work matters: SG can be feasible in one regime,
+                then degrade when episode budget is increased without coordinated retuning.
+              </p>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><h2>Parameter and Evidence Table</h2></div>
+            <div class="card-body">
+              <table id="sgTable"></table>
+              <p class="small" style="margin-top:9px">
+                Key optimization parameters shown here: <code>alpha</code>,
+                <code>epsilon_decay</code>, <code>epsilon_min</code>, and stage budget.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="footer">
+        Generated from <code>video/assets/data/*.csv</code> by
+        <code>video/final/demo/build_demo_data.py</code>.
+      </div>
+    </div>
+
+    <script src="./data.js"></script>
+    <script>
+      (function () {
+        const data = window.DEMO_DATA;
+        if (!data) {
+          alert("Missing DEMO_DATA. Run build_demo_data.py first.");
+          return;
+        }
+
+        const gateRows = data.gate_rows || [];
+        const withNoRows = data.with_no_rows || [];
+        const sgRows = data.sg_budget_rows || [];
+        const mainRows = data.main_conclusion_rows || [];
+        const headlineRows = data.headline_rows || [];
+
+        const tabs = [
+          { id: "xlf", label: "1) Why XLF + Project Purpose" },
+          { id: "mechanics", label: "2) TD Mechanics Lab" },
+          { id: "gate", label: "3) Gate Replay Demo" },
+          { id: "application", label: "4) ETF Application Case" },
+          { id: "tuning", label: "5) Parameter / Setback" },
+        ];
+
+        function fmt(v, d = 4) {
+          return Number(v).toFixed(d).replace(/\.?0+$/, "");
+        }
+
+        function yorn(v) {
+          return v ? "Yes" : "No";
+        }
+
+        function initTabs() {
+          const tabsEl = document.getElementById("tabs");
+          tabsEl.innerHTML = tabs
+            .map(
+              (t, i) =>
+                `<button class="tab-btn ${i === 0 ? "active" : ""}" data-id="${t.id}">${t.label}</button>`
+            )
+            .join("");
+          tabsEl.addEventListener("click", (e) => {
+            const btn = e.target.closest(".tab-btn");
+            if (!btn) return;
+            const id = btn.dataset.id;
+            document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+            document.getElementById(`panel-${id}`).classList.add("active");
+          });
+        }
+
+        function renderXlfPanel() {
+          const baseline = mainRows.find((r) => String(r.model).toLowerCase().includes("baseline"));
+          const promoted = headlineRows.find((r) => r.promoted) || headlineRows[0];
+          const avgWithNo = withNoRows.reduce(
+            (acc, r) => {
+              acc.reward += Number(r.reward_delta || 0);
+              acc.ret += Number(r.return_delta || 0);
+              acc.cvar += Number(r.cvar_delta || 0);
+              acc.mdd += Number(r.mdd_delta || 0);
+              return acc;
+            },
+            { reward: 0, ret: 0, cvar: 0, mdd: 0 }
+          );
+          const n = Math.max(withNoRows.length, 1);
+          const kpis = [
+            { label: "Baseline Return", value: baseline ? fmt(baseline.return) : "-" },
+            { label: "Promoted Algo", value: promoted ? promoted.algo_label : "-" },
+            { label: "Promoted Return", value: promoted ? fmt(promoted.return) : "-" },
+            { label: "Avg with-no CVaR Δ", value: fmt(avgWithNo.cvar / n) },
+            { label: "Avg with-no MDD Δ", value: fmt(avgWithNo.mdd / n) },
+            { label: "Gate Pass Count", value: String(gateRows.filter((r) => r.promoted).length) + "/3" },
+          ];
+          document.getElementById("xlfKpis").innerHTML = kpis
+            .map((k) => `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div></div>`)
+            .join("");
+
+          document.getElementById("headlineTable").innerHTML = `
+            <thead>
+              <tr><th>Algorithm</th><th>Promoted</th><th>Reward</th><th>Return</th><th>CVaR</th><th>MDD</th><th>Train(s)</th></tr>
+            </thead>
+            <tbody>
+              ${headlineRows
+                .map(
+                  (r) => `<tr class="${r.promoted ? "promoted" : ""}">
+                    <td>${r.algo_label}</td>
+                    <td>${yorn(r.promoted)}</td>
+                    <td>${fmt(r.reward)}</td>
+                    <td>${fmt(r.return)}</td>
+                    <td>${fmt(r.cvar)}</td>
+                    <td>${fmt(r.mdd)}</td>
+                    <td>${fmt(r.train_time_s)}</td>
+                  </tr>`
+                )
+                .join("")}
+            </tbody>
+          `;
+        }
+
+        function initMechanicsLab() {
+          const modeDefs = [
+            { id: "q_learning", label: "Q-learning" },
+            { id: "sg_sarsa", label: "SG-Sarsa" },
+            { id: "nstep_sarsa", label: "n-step Sarsa" },
+          ];
+          let mode = "q_learning";
+
+          const params = {
+            alpha: 0.2,
+            gamma: 0.95,
+            current_q: 0.12,
+            reward: 0.08,
+            next_max_q: 0.25,
+            next_policy_q: 0.18,
+            nstep_return: 0.21,
+            q_tail: 0.16,
+            n: 3,
+            feature_x: 0.7,
+            weight_w: 0.22,
+          };
+
+          const sliderDefs = [
+            { key: "alpha", min: 0.01, max: 0.5, step: 0.01 },
+            { key: "gamma", min: 0.5, max: 0.999, step: 0.001 },
+            { key: "current_q", min: -0.5, max: 0.8, step: 0.01 },
+            { key: "reward", min: -0.3, max: 0.3, step: 0.01 },
+            { key: "next_max_q", min: -0.2, max: 0.8, step: 0.01 },
+            { key: "next_policy_q", min: -0.2, max: 0.8, step: 0.01 },
+            { key: "nstep_return", min: -0.3, max: 0.8, step: 0.01 },
+            { key: "q_tail", min: -0.2, max: 0.8, step: 0.01 },
+            { key: "n", min: 1, max: 7, step: 1 },
+            { key: "feature_x", min: 0.1, max: 1.0, step: 0.05 },
+            { key: "weight_w", min: -0.5, max: 0.8, step: 0.01 },
+          ];
+
+          const modeEl = document.getElementById("algoModeBtns");
+          const slidersEl = document.getElementById("sliderGrid");
+          const formulaEl = document.getElementById("formulaBox");
+          const resultEl = document.getElementById("resultGrid");
+          const explainEl = document.getElementById("mechanicsExplain");
+
+          function renderModeBtns() {
+            modeEl.innerHTML = modeDefs
+              .map(
+                (m) =>
+                  `<button data-mode="${m.id}" ${m.id === mode ? 'style="font-weight:600;background:#eaf4fd"' : ""}>${m.label}</button>`
+              )
+              .join("");
+          }
+
+          function renderSliders() {
+            slidersEl.innerHTML = sliderDefs
+              .map(
+                (s) => `
+                <div class="s-item">
+                  <label>${s.key}<span id="val-${s.key}">${fmt(params[s.key], s.step < 1 ? 3 : 0)}</span></label>
+                  <input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${params[s.key]}" data-key="${s.key}" />
+                </div>`
+              )
+              .join("");
+          }
+
+          function compute() {
+            const a = Number(params.alpha);
+            const g = Number(params.gamma);
+            const q = Number(params.current_q);
+            const r = Number(params.reward);
+            const qMax = Number(params.next_max_q);
+            const qPol = Number(params.next_policy_q);
+            const gN = Number(params.nstep_return);
+            const qTail = Number(params.q_tail);
+            const n = Number(params.n);
+            const x = Number(params.feature_x);
+            const w = Number(params.weight_w);
+
+            let target = 0;
+            let formula = "";
+            let explain = "";
+            if (mode === "q_learning") {
+              target = r + g * qMax;
+              formula = `Q <- Q + alpha * [r + gamma * max_a' Q(s',a') - Q]\n\nTarget = ${fmt(r)} + ${fmt(g)} * ${fmt(qMax)} = ${fmt(target)}`;
+              explain =
+                "Q-learning uses the greedy bootstrap target. In this project, this can lift utility quickly but may fail downside checks under the synchronized gate.";
+            } else if (mode === "sg_sarsa") {
+              target = r + g * qPol;
+              formula = `delta = r + gamma * q(s',a') - q(s,a)\nq <- q + alpha * delta\nw <- w + alpha * delta * x\n\nTarget = ${fmt(r)} + ${fmt(g)} * ${fmt(qPol)} = ${fmt(target)}`;
+              explain =
+                "SG-Sarsa updates on-policy. It is often smoother than Q-learning, but highly sensitive to alpha, epsilon schedule, and episode budget.";
+            } else {
+              target = gN + Math.pow(g, n) * qTail;
+              formula = `delta = [G_t:t+n + gamma^n * q(s_t+n,a_t+n)] - q(s,a)\nq <- q + alpha * delta\n\nTarget = ${fmt(gN)} + ${fmt(g)}^${n} * ${fmt(qTail)} = ${fmt(target)}`;
+              explain =
+                "n-step Sarsa uses a longer-horizon target. In this project, it provides the best risk-feasible tradeoff under the synchronized gate.";
+            }
+
+            const td = target - q;
+            const qNew = q + a * td;
+            const wNew = w + a * td * x;
+
+            formulaEl.textContent = formula;
+            explainEl.textContent = explain;
+            resultEl.innerHTML = `
+              <div class="rbox"><div class="k">Target</div><div class="v">${fmt(target)}</div></div>
+              <div class="rbox"><div class="k">TD Error</div><div class="v">${fmt(td)}</div></div>
+              <div class="rbox"><div class="k">Updated Q</div><div class="v">${fmt(qNew)}</div></div>
+              <div class="rbox"><div class="k">alpha</div><div class="v">${fmt(a)}</div></div>
+              <div class="rbox"><div class="k">gamma</div><div class="v">${fmt(g)}</div></div>
+              <div class="rbox"><div class="k">Updated w (SG proxy)</div><div class="v">${fmt(wNew)}</div></div>
+            `;
+          }
+
+          modeEl.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-mode]");
+            if (!btn) return;
+            mode = btn.dataset.mode;
+            renderModeBtns();
+            compute();
+          });
+
+          slidersEl.addEventListener("input", (e) => {
+            const el = e.target;
+            if (!el.matches("input[data-key]")) return;
+            const key = el.dataset.key;
+            params[key] = Number(el.value);
+            const span = document.getElementById(`val-${key}`);
+            if (span) span.textContent = fmt(params[key], Number(el.step) < 1 ? 3 : 0);
+            compute();
+          });
+
+          renderModeBtns();
+          renderSliders();
+          compute();
+        }
+
+        function initGatePanel() {
+          const metricDefs = [
+            { key: "reward_delta", label: "Reward d", good: (v) => v > 0 },
+            { key: "return_delta", label: "Return d", good: (v) => v > 0 },
+            { key: "cvar_delta", label: "CVaR d", good: (v) => v < 0 },
+            { key: "mdd_delta", label: "MDD d", good: (v) => v > 0 },
+          ];
+          const checkDefs = [
+            { key: "check_primary", label: "Primary" },
+            { key: "check_secondary", label: "Secondary" },
+            { key: "check_cvar", label: "CVaR" },
+            { key: "check_mdd", label: "MDD" },
+            { key: "check_seed_consistency", label: "Seed" },
+          ];
+          const maxAbs = {};
+          metricDefs.forEach((m) => {
+            maxAbs[m.key] = Math.max(...gateRows.map((r) => Math.abs(Number(r[m.key]))), 1e-9);
+          });
+
+          let idx = 0;
+          let timer = null;
+          let running = true;
+
+          const cardsEl = document.getElementById("algoCards");
+          const barsEl = document.getElementById("metricBars");
+          const checksEl = document.getElementById("checkGrid");
+          const decisionEl = document.getElementById("decisionLine");
+          const stepEl = document.getElementById("stepTag");
+          const titleEl = document.getElementById("focusTitle");
+          const prevBtn = document.getElementById("prevBtn");
+          const nextBtn = document.getElementById("nextBtn");
+          const playBtn = document.getElementById("playBtn");
+
+          function render() {
+            cardsEl.innerHTML = gateRows
+              .map((r, i) => {
+                const active = i === idx ? "active" : "";
+                const tag = r.promoted ? "promoted" : "rejected";
+                return `<div class="algo-card ${active}" data-idx="${i}">
+                  <div class="name">${r.algo_label}</div>
+                  <div class="meta-line">reward d: ${fmt(r.reward_delta)} | return d: ${fmt(r.return_delta)}</div>
+                  <div class="meta-line">decision: <span class="decision-tag ${tag}">${r.decision}</span></div>
+                </div>`;
+              })
+              .join("");
+
+            const row = gateRows[idx];
+            titleEl.textContent = `Focused Metrics - ${row.algo_label}`;
+            stepEl.textContent = `Step ${idx + 1} / ${gateRows.length}`;
+
+            barsEl.innerHTML = metricDefs
+              .map((m) => {
+                const v = Number(row[m.key]);
+                const w = Math.max(10, (Math.abs(v) / maxAbs[m.key]) * 100);
+                const good = m.good(v);
+                return `<div class="row">
+                  <label>${m.label}</label>
+                  <div class="bar-bg"><div class="bar-fill ${good ? "good" : "bad"}" style="width:${w}%"></div></div>
+                  <div class="bar-val">${fmt(v)}</div>
+                </div>`;
+              })
+              .join("");
+
+            checksEl.innerHTML = checkDefs
+              .map((c) => {
+                const pass = !!row[c.key];
+                return `<div class="check ${pass ? "pass" : "fail"}"><span>${c.label}</span><strong>${pass ? "PASS" : "FAIL"}</strong></div>`;
+              })
+              .join("");
+
+            decisionEl.innerHTML = `
+              <div><strong>Decision:</strong> <span class="decision-tag ${row.promoted ? "promoted" : "rejected"}">${row.decision}</span></div>
+              <div style="margin-top:4px;color:#4c5f71">${row.decision_reason}</div>
+            `;
+          }
+
+          function setIdx(next) {
+            idx = (next + gateRows.length) % gateRows.length;
+            render();
+          }
+
+          function start() {
+            stop();
+            timer = setInterval(() => setIdx(idx + 1), 9000);
+            running = true;
+            playBtn.textContent = "Pause";
+          }
+
+          function stop() {
+            if (timer) clearInterval(timer);
+            timer = null;
+            running = false;
+            playBtn.textContent = "Play";
+          }
+
+          cardsEl.addEventListener("click", (e) => {
+            const card = e.target.closest(".algo-card");
+            if (!card) return;
+            setIdx(Number(card.dataset.idx));
+          });
+          prevBtn.addEventListener("click", () => setIdx(idx - 1));
+          nextBtn.addEventListener("click", () => setIdx(idx + 1));
+          playBtn.addEventListener("click", () => (running ? stop() : start()));
+
+          setIdx(0);
+          start();
+        }
+
+        function initTuningPanel() {
+          const table = document.getElementById("sgTable");
+          table.innerHTML = `
+            <thead>
+              <tr><th>Stage</th><th>Promoted</th><th>Episodes</th><th>alpha</th><th>eps_decay</th><th>eps_min</th><th>ret d</th><th>cvar d</th><th>train(s)</th></tr>
+            </thead>
+            <tbody>
+              ${sgRows
+                .map(
+                  (r) => `<tr class="${r.promoted ? "promoted" : ""}">
+                    <td>${r.experiment}</td>
+                    <td>${yorn(r.promoted)}</td>
+                    <td>${r.episodes}</td>
+                    <td>${fmt(r.alpha)}</td>
+                    <td>${fmt(r.epsilon_decay)}</td>
+                    <td>${fmt(r.epsilon_min)}</td>
+                    <td>${fmt(r.return_delta)}</td>
+                    <td>${fmt(r.cvar_delta)}</td>
+                    <td>${fmt(r.train_seconds)}</td>
+                  </tr>`
+                )
+                .join("")}
+            </tbody>
+          `;
+
+          const metricMap = {
+            return_delta: { label: "Return d", higherBetter: true },
+            reward_delta: { label: "Reward d", higherBetter: true },
+            cvar_delta: { label: "CVaR d", higherBetter: false },
+            mdd_delta: { label: "MDD d", higherBetter: true },
+            train_seconds: { label: "Train(s)", higherBetter: false },
+          };
+
+          const sel = document.getElementById("metricSelect");
+          const chart = document.getElementById("stageChart");
+
+          function renderChart() {
+            const k = sel.value;
+            const vals = sgRows.map((r) => Number(r[k]));
+            const maxAbs = Math.max(...vals.map((v) => Math.abs(v)), 1e-9);
+            const meta = metricMap[k];
+            chart.innerHTML = sgRows
+              .map((r) => {
+                const v = Number(r[k]);
+                const w = Math.max(8, (Math.abs(v) / maxAbs) * 100);
+                return `<div class="stage-row">
+                  <div class="label">${r.experiment}</div>
+                  <div class="bar"><div class="fill" style="width:${w}%"></div></div>
+                  <div class="value">${fmt(v)}</div>
+                </div>`;
+              })
+              .join("");
+            chart.insertAdjacentHTML(
+              "beforeend",
+              `<p class="small" style="margin-top:8px">Metric meaning: <strong>${meta.label}</strong> (${meta.higherBetter ? "higher is better" : "lower is better"}).</p>`
+            );
+          }
+
+          sel.addEventListener("change", renderChart);
+          renderChart();
+        }
+
+        function initApplicationPanel() {
+          const caseTable = document.getElementById("caseTable");
+          const riskProfile = document.getElementById("riskProfile");
+          const capitalInput = document.getElementById("capitalInput");
+          const caseBanner = document.getElementById("caseBanner");
+          const caseRuleTag = document.getElementById("caseRuleTag");
+          const caseNarrative = document.getElementById("caseNarrative");
+          const caseBullets = document.getElementById("caseBullets");
+          const caseChart = document.getElementById("caseChart");
+
+          const xlfTrend = data.xlf_trend || [];
+          const gateMap = {};
+          gateRows.forEach((r) => {
+            gateMap[r.algo] = r;
+          });
+
+          const profileRuleText = {
+            conservative:
+              "Rule: strict gate first (Primary+Secondary+CVaR+MDD), tie-break by lower CVaR.",
+            balanced:
+              "Rule: promoted-first under synchronized gate, then choose higher return.",
+            aggressive: "Rule: maximize return only (gate checks shown but not used for selection).",
+          };
+
+          const algoColor = {
+            q_learning: "#b1463d",
+            sg_sarsa: "#2b5f8a",
+            nstep_sarsa: "#2f8f4f",
+          };
+
+          function withDerived() {
+            const capital = Math.max(1000, Number(capitalInput.value) || 10000);
+            return headlineRows.map((r) => {
+              const g = gateMap[r.algo] || {};
+              const fullGate =
+                !!g.check_primary && !!g.check_secondary && !!g.check_cvar && !!g.check_mdd;
+              return {
+                ...r,
+                final_capital: capital * (1 + Number(r.return)),
+                check_cvar: !!g.check_cvar,
+                check_mdd: !!g.check_mdd,
+                check_primary: !!g.check_primary,
+                check_secondary: !!g.check_secondary,
+                gate_ok: fullGate,
+                promoted: !!r.promoted,
+              };
+            });
+          }
+
+          function pickAlgo(rows, profile) {
+            if (!rows.length) return null;
+            const riskFeasible = rows.filter((r) => r.gate_ok);
+            if (profile === "aggressive") {
+              return rows.slice().sort((a, b) => Number(b.return) - Number(a.return))[0];
+            }
+            if (profile === "conservative") {
+              if (riskFeasible.length) {
+                return riskFeasible.slice().sort((a, b) => Number(a.cvar) - Number(b.cvar))[0];
+              }
+              return rows.slice().sort((a, b) => Number(a.cvar) - Number(b.cvar))[0];
+            }
+            const promoted = rows.filter((r) => r.promoted);
+            if (promoted.length) {
+              return promoted.slice().sort((a, b) => Number(b.return) - Number(a.return))[0];
+            }
+            if (riskFeasible.length) {
+              return riskFeasible.slice().sort((a, b) => Number(b.return) - Number(a.return))[0];
+            }
+            return rows.slice().sort((a, b) => Number(b.return) - Number(a.return))[0];
+          }
+
+          function drawCaseChart(rows, picked) {
+            if (!caseChart) return;
+            const NS = "http://www.w3.org/2000/svg";
+            while (caseChart.firstChild) caseChart.removeChild(caseChart.firstChild);
+
+            const width = 520;
+            const height = 220;
+            const left = 48;
+            const right = 16;
+            const top = 14;
+            const bottom = 30;
+            const innerW = width - left - right;
+            const innerH = height - top - bottom;
+
+            const trendVals = xlfTrend.map((p) => Number(p.norm_close)).filter((v) => Number.isFinite(v));
+            const projVals = rows.map((r) => 1 + Number(r.return));
+            const allY = trendVals.concat([1]).concat(projVals);
+            const yMinRaw = Math.min(...allY);
+            const yMaxRaw = Math.max(...allY);
+            const pad = Math.max(0.03, (yMaxRaw - yMinRaw) * 0.08);
+            const yMin = yMinRaw - pad;
+            const yMax = yMaxRaw + pad;
+
+            const xScale = (i, n) => left + (n <= 1 ? 0 : (i / (n - 1)) * innerW);
+            const yScale = (v) => top + ((yMax - v) / (yMax - yMin)) * innerH;
+
+            function line(x1, y1, x2, y2, stroke = "#d6e1ea", dash = "") {
+              const l = document.createElementNS(NS, "line");
+              l.setAttribute("x1", String(x1));
+              l.setAttribute("y1", String(y1));
+              l.setAttribute("x2", String(x2));
+              l.setAttribute("y2", String(y2));
+              l.setAttribute("stroke", stroke);
+              l.setAttribute("stroke-width", "1");
+              if (dash) l.setAttribute("stroke-dasharray", dash);
+              caseChart.appendChild(l);
+              return l;
+            }
+
+            function text(x, y, value, size = 10, anchor = "start", fill = "#627484") {
+              const t = document.createElementNS(NS, "text");
+              t.setAttribute("x", String(x));
+              t.setAttribute("y", String(y));
+              t.setAttribute("font-size", String(size));
+              t.setAttribute("font-family", "IBM Plex Sans, sans-serif");
+              t.setAttribute("text-anchor", anchor);
+              t.setAttribute("fill", fill);
+              t.textContent = value;
+              caseChart.appendChild(t);
+              return t;
+            }
+
+            for (let k = 0; k <= 4; k++) {
+              const yv = yMin + ((yMax - yMin) * k) / 4;
+              const y = yScale(yv);
+              line(left, y, width - right, y, "#e7eef4");
+              text(left - 8, y + 3, fmt(yv, 2), 10, "end");
+            }
+            line(left, top, left, height - bottom, "#b9c8d6");
+            line(left, height - bottom, width - right, height - bottom, "#b9c8d6");
+
+            const xStart = left;
+            const xEnd = width - right;
+
+            if (xlfTrend.length >= 2) {
+              const path = document.createElementNS(NS, "path");
+              const d = xlfTrend
+                .map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(i, xlfTrend.length)} ${yScale(Number(p.norm_close))}`)
+                .join(" ");
+              path.setAttribute("d", d);
+              path.setAttribute("fill", "none");
+              path.setAttribute("stroke", "#1f7b7a");
+              path.setAttribute("stroke-width", "2.2");
+              caseChart.appendChild(path);
+              text(xStart, height - 8, xlfTrend[0].date, 10, "start");
+              text(xEnd, height - 8, xlfTrend[xlfTrend.length - 1].date, 10, "end");
+            } else {
+              text(xStart, height - 8, "start", 10, "start");
+              text(xEnd, height - 8, "end", 10, "end");
+            }
+
+            rows.forEach((r) => {
+              const endY = yScale(1 + Number(r.return));
+              const selected = r.algo === picked.algo;
+              const l = line(xStart, yScale(1), xEnd, endY, algoColor[r.algo] || "#2b5f8a", "6 4");
+              l.setAttribute("stroke-width", selected ? "3" : "2");
+              l.setAttribute("opacity", selected ? "1" : "0.7");
+            });
+
+            const legendY = top + 12;
+            const legendItems = [
+              { label: "XLF trend", color: "#1f7b7a", dash: "" },
+              { label: "Q-learning proj", color: algoColor.q_learning, dash: "6 4" },
+              { label: "SG-Sarsa proj", color: algoColor.sg_sarsa, dash: "6 4" },
+              { label: "n-step proj", color: algoColor.nstep_sarsa, dash: "6 4" },
+            ];
+            legendItems.forEach((it, i) => {
+              const lx = left + i * 112;
+              const ly = legendY;
+              const seg = line(lx, ly, lx + 15, ly, it.color, it.dash);
+              seg.setAttribute("stroke-width", "2");
+              text(lx + 19, ly + 3, it.label, 10, "start", "#445a6e");
+            });
+          }
+
+          function renderCase() {
+            const rows = withDerived();
+            const profile = riskProfile.value;
+            const picked = pickAlgo(rows, profile);
+            if (!picked) return;
+
+            caseRuleTag.textContent = profileRuleText[profile];
+
+            caseTable.innerHTML = `
+              <thead>
+                <tr>
+                  <th>Algorithm</th><th>Return</th><th>CVaR</th><th>MDD</th><th>Gate Pass</th><th>Promoted</th><th>Final Capital</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows
+                  .map((r) => {
+                    const selected = r.algo === picked.algo ? "selected" : "";
+                    return `<tr class="${selected}">
+                      <td>${r.algo_label}</td>
+                      <td>${fmt(r.return)}</td>
+                      <td>${fmt(r.cvar)}</td>
+                      <td>${fmt(r.mdd)}</td>
+                      <td>${yorn(r.gate_ok)}</td>
+                      <td>${yorn(r.promoted)}</td>
+                      <td>$${fmt(r.final_capital, 2)}</td>
+                    </tr>`;
+                  })
+                  .join("")}
+              </tbody>
+            `;
+
+            const riskStatus = picked.gate_ok ? "pass" : "fail";
+            caseBanner.innerHTML = `
+              <strong>Selected for ${profile} profile:</strong> ${picked.algo_label}
+              &nbsp;|&nbsp; Expected final capital: <strong>$${fmt(picked.final_capital, 2)}</strong>
+              &nbsp;|&nbsp; Gate status: <strong>${riskStatus}</strong>
+            `;
+
+            caseNarrative.textContent =
+              "This case maps research outputs to a practical ETF decision flow: profile -> rule -> selected policy. In this dataset, return-first and risk-first rules lead to different choices, which is exactly why the comparison is meaningful.";
+
+            const bullets = [];
+            if (profile === "aggressive") {
+              bullets.push("Aggressive mode selects the highest-return candidate (Q-learning in current XLF results).");
+              bullets.push("This may increase expected capital but can violate downside gate constraints.");
+            } else if (profile === "conservative") {
+              bullets.push("Conservative mode enforces full gate feasibility before return preference.");
+              bullets.push("Current results select n-step Sarsa because it is the only full gate-pass candidate.");
+            } else {
+              bullets.push("Balanced mode follows the report policy: promoted-first under synchronized evaluation.");
+              bullets.push("This keeps deployment consistent with risk-sensitive project objectives.");
+            }
+            bullets.push(
+              `With $${fmt(Number(capitalInput.value) || 10000, 0)} initial capital, selected projection is $${fmt(
+                picked.final_capital,
+                2
+              )}.`
+            );
+            caseBullets.innerHTML = bullets.map((b) => `<li>${b}</li>`).join("");
+
+            drawCaseChart(rows, picked);
+          }
+
+          riskProfile.addEventListener("change", renderCase);
+          capitalInput.addEventListener("input", renderCase);
+          renderCase();
+        }
+
+        initTabs();
+        renderXlfPanel();
+        initMechanicsLab();
+        initGatePanel();
+        initApplicationPanel();
+        initTuningPanel();
+      })();
+    </script>
+  </body>
+</html>
