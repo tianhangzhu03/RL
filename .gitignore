@@ -8,3 +8,11 @@ runs_smoke/
 runs_*/
 archive_runs/
 report/figures/*.png
+tmp/
+output/
+
+# Local-only presentation drafts (not for remote)
+video/final/video_script_bilingual.md
+video/final/video_script_bilingual.pdf
+video/final/video_script_bilingual_ipad.pdf
+video/final/*_ipad.pdf
