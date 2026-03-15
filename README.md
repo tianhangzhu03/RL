@@ -19,24 +19,23 @@ The objective is not unconstrained return maximization. The objective is policy 
 - Reward components: portfolio return, transaction cost, volatility/CVaR penalties, inactivity/opportunity cost terms
 - Evaluation focus: reward/return plus risk metrics (`CVaR`, `MDD`) and training-time behavior
 
-## Canonical Deliverables
+## Public Repository Scope
 
-- Final report notebook: `report/final/report.ipynb`
-- Final report PDF: `report/final/report.pdf`
-- Final report figures: `report/final/figures/`
-- Final report tables/data: `report/final/data/`
-- Video/demo package:
-  - `video/final/demo/index.html`
-  - `video/final/video_script_en.md`
-  - `video/final/slide_outline.md`
+This remote repository is intentionally restricted to the core project package:
+
+- `src/`: RL environment, agents, training/evaluation/tuning logic
+- `configs/`: active experiment configuration
+- `experiments/`: compact experiment summaries and selected best configs
+- `tests/`: unit/smoke tests
+- `scripts/`: setup and helper scripts
+
+Report and presentation working assets are kept local and excluded from remote tracking.
 
 ## Repository Layout
 
 - `src/`: environment, agents, training, evaluation, tuning, and visualization utilities
 - `configs/`: active experiment configs (`base.yaml`, `main_xlf.yaml`, `xlf_promotion_gate.yaml`)
 - `experiments/`: compact experiment summaries and selected best configs
-- `report/`: final report assets (notebook, PDF, figures, tables)
-- `video/`: presentation assets and interactive demo
 - `tests/`: unit tests and smoke tests
 - `scripts/`: setup and export helpers
 
@@ -63,27 +62,17 @@ scripts/py.sh -m src.train --algo nstep_sarsa --config configs/main_xlf.yaml --s
 scripts/py.sh -m src.eval --run-dir <RUN_DIR>
 ```
 
-### 3) Build final report visuals (if needed)
+### 3) Build visualization outputs (optional)
 
 ```bash
 scripts/py.sh -m src.final_viz
 ```
 
-## Run Interactive Demo
-
-```bash
-scripts/py.sh video/final/demo/build_demo_data.py
-scripts/py.sh -m http.server 8080 --directory video/final/demo
-```
-
-Then open `http://localhost:8080`.
-
-## Export Report PDF
-
-```bash
-bash scripts/export_report_pdf.sh report/final/report.ipynb webpdf
-```
-
 ## Notes on Upload Scope
 
-This repository tracks the English project package for report and presentation. Local-only drafts and temporary outputs are ignored via `.gitignore` (for example `tmp/`, `output/`, and bilingual private script drafts).
+Local/private artifacts are excluded via `.gitignore`, including:
+
+- `report/`
+- `video/`
+- `tmp/`
+- `output/`
