@@ -7,7 +7,8 @@ runs/
 runs_smoke/
 runs_*/
 archive_runs/
-report/figures/*.png
+report/
+video/
 tmp/
 output/
 
